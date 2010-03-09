@@ -1,5 +1,8 @@
 require 'tempfile'
 require 'rbconfig'
+require 'rubygems'
+require 'shellwords'
+require 'open4'
 
 module Aruba
 module Api
@@ -76,8 +79,16 @@ module Api
     Regexp.compile(Regexp.escape(string))
   end
 
-  def combined_output
-    @last_stdout + (@last_stderr == '' ? '' : "\n#{'-'*70}\n#{@last_stderr}")
+  def combined_output(name=nil)
+    if(name)
+      stdout = children[name].stdout
+      stderr = children[name].stderr
+    else
+      stdout = @last_stdout
+      stderr = @last_stderr
+    end
+    raise "Nothing has been run yet" if stdout.nil?
+    stdout + (stderr == '' ? '' : "\n#{'-'*70}\n#{stderr}")
   end
 
   def use_rvm(rvm_ruby_version)
@@ -92,28 +103,59 @@ module Api
     @rvm_gemset = rvm_gemset
   end
 
-  def run(cmd)
+  def run(cmd, name=nil)
     cmd = detect_ruby_script(cmd)
     cmd = detect_ruby(cmd)
 
     announce("$ #{cmd}") if @announce_cmd
 
-    stderr_file = Tempfile.new('cucumber')
-    stderr_file.close
     in_current_dir do
       mode = RUBY_VERSION =~ /^1\.9/ ? {:external_encoding=>"UTF-8"} : 'r'
-      IO.popen("#{cmd} 2> #{stderr_file.path}", mode) do |io|
-        @last_stdout = io.read
 
-        announce(@last_stdout) if @announce_stdout
+      if(name)
+        pid, stdin, stdout, stderr = Open4::popen4(*Shellwords.shellwords(cmd))
+        children[name] = Child.new(pid, stdin, stdout, stderr)
+      else
+        Open4::popen4(*Shellwords.shellwords(cmd)) do |pid, stdin, stdout, stderr|
+          @last_stdout = stdout.read
+          announce(@last_stdout) if @announce_stdout
+
+          @last_stderr = stderr.read
+          announce(@last_stderr) if @announce_stderr
+        end
+        @last_exit_status = $?.exitstatus
       end
-
-      @last_exit_status = $?.exitstatus
     end
-    @last_stderr = IO.read(stderr_file.path)
+  end
 
-    announce(@last_stderr) if @announce_stderr
-    @last_stderr
+  def last_exit_status
+    @last_exit_status
+  end
+
+  def child_write(input, name)
+    children[name].write(input)
+  end
+
+  def child_running?(name)
+    children[name].running?
+  end
+
+  def child_exit_status(name)
+    children[name].exit_status
+  end
+
+  def child_sig(signal, name)
+    children[name].kill(signal)
+  end
+
+  def children
+    @children ||= {}
+  end
+
+  def kill_all
+    children.each do |name, child|
+      child.kill('TERM')
+    end
   end
 
   def detect_ruby(cmd)
@@ -140,6 +182,41 @@ module Api
       "rvm #{rvm_ruby_version_with_gemset} ruby"
     else
       File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name'])
+    end
+  end
+
+  class Child
+    def initialize(pid, stdin, stdout, stderr)
+      @pid, @stdin, @stdout, @stderr = pid, stdin, stdout, stderr
+    end
+
+    def write(input)
+      @stdin.write(input)
+    end
+
+    def stdout
+      @stdout.read
+    end
+
+    def stderr
+      @stderr.read
+    end
+
+    def running?
+      begin
+        Process.getpgid(@pid)
+      rescue Errno::ESRCH
+        false
+      end
+    end
+
+    def exit_status
+      ignored, status = Process::waitpid2(@pid)
+      status.exitstatus
+    end
+
+    def kill(signal)
+      Process.kill(Signal.list[signal], @pid)
     end
   end
 end
