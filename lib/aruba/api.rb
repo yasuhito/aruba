@@ -102,7 +102,15 @@ module Api
   def use_rvm_gemset(rvm_gemset)
     @rvm_gemset = rvm_gemset
   end
-
+  
+  def delete_rvm_gemset(rvm_gemset)
+    run "rvm --force gemset delete #{rvm_gemset}"
+  end
+  
+  def create_rvm_gemset(rvm_gemset)
+    run "rvm gemset create #{rvm_gemset}"
+  end
+  
   def run(cmd, name=nil)
     cmd = detect_ruby_script(cmd)
     cmd = detect_ruby(cmd)
@@ -178,7 +186,7 @@ module Api
 
   def current_ruby
     if @rvm_ruby_version
-      rvm_ruby_version_with_gemset = @rvm_gemset ? "#{@rvm_ruby_version}%#{@rvm_gemset}" : @rvm_ruby_version
+      rvm_ruby_version_with_gemset = @rvm_gemset ? "#{@rvm_ruby_version}@#{@rvm_gemset}" : @rvm_ruby_version
       "rvm #{rvm_ruby_version_with_gemset} ruby"
     else
       File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name'])
