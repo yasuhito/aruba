@@ -5,6 +5,7 @@ require 'aruba/creators/aruba_file_creator'
 require 'aruba/creators/aruba_fixed_size_file_creator'
 
 require 'aruba/platform/determine_disk_usage'
+require 'aruba/platform/determine_file_size'
 
 require 'aruba/disk_usage_calculator'
 require 'aruba/aruba_path'
@@ -319,8 +320,18 @@ module Aruba
       #   Bytes on disk
       def disk_usage(*paths)
         expect(paths).to all be_an_existing_path
-        
+
         DetermineDiskUsage.new.use paths.flatten.map { |p| ArubaPath.new(expand_path(p)) }
+      end
+
+      # Get size of file
+      #
+      # @return [Numeric]
+      #   The size of the file
+      def file_size(name)
+        expect(name).to be_an_existing_file
+
+        DetermineFileSize.new.use expand_path(name)
       end
     end
   end
