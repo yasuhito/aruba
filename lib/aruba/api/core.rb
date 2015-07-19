@@ -53,6 +53,8 @@ module Aruba
             fail ArgumentError, "#{expand_path(dir)} is not a directory or does not exist." unless Aruba::Platform.directory? expand_path(dir)
 
             aruba.current_directory << dir
+            announcer.announce :directory, expand_path(dir)
+
 
             old_dir    = Aruba::Platform.getwd
             old_oldpwd = ENV['OLDPWD']
@@ -77,6 +79,7 @@ module Aruba
         fail ArgumentError, "#{expand_path(dir)} is not a directory or does not exist." unless Aruba::Platform.directory? expand_path(dir)
 
         aruba.current_directory << dir
+        announcer.announce :directory, expand_path(dir)
 
         self
       end
