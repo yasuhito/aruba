@@ -4,6 +4,8 @@ require 'aruba/extensions/string/strip'
 require 'aruba/creators/aruba_file_creator'
 require 'aruba/creators/aruba_fixed_size_file_creator'
 
+require 'aruba/platform/determine_disk_usage'
+
 require 'aruba/disk_usage_calculator'
 require 'aruba/aruba_path'
 
@@ -316,14 +318,9 @@ module Aruba
       # @result [FileSize]
       #   Bytes on disk
       def disk_usage(*paths)
-        size = paths.flatten.map do |p|
-          DiskUsageCalculator.new.calc(
-            ArubaPath.new(expand_path(p)).blocks,
-            aruba.config.physical_block_size
-          )
-        end.inject(0, &:+)
-
-        FileSize.new(size)
+        expect(paths).to all be_an_existing_path
+        
+        DetermineDiskUsage.new.use paths.flatten.map { |p| ArubaPath.new(expand_path(p)) }
       end
     end
   end
