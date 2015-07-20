@@ -548,7 +548,7 @@ module Aruba
       def last_command
         Aruba::Platform.deprecated('The use of "#last_command" is deprecated. Use "#last_command_started"')
 
-        process_monitor.last_command
+        process_monitor.last_command_started
       end
     end
   end
