@@ -271,9 +271,9 @@ Then /^the output(?: from "(.*?)")? should( not)? contain exactly "(.*?)"$/ do |
              end
 
   if negated
-    expect(commands).not_to have_output Aruba::Platform.unescape(expected)
+    expect(commands).not_to include have_output Aruba::Platform.unescape(expected)
   else
-    expect(commands).to have_output Aruba::Platform.unescape(expected)
+    expect(commands).to include have_output Aruba::Platform.unescape(expected)
   end
 end
 
@@ -287,9 +287,9 @@ Then /^the output(?: from "(.*?)")? should( not)? contain exactly:$/ do |cmd, ne
              end
 
   if negated
-    expect(commands).not_to have_output Aruba::Platform.unescape(expected)
+    expect(commands).not_to include have_output Aruba::Platform.unescape(expected)
   else
-    expect(commands).to have_output Aruba::Platform.unescape(expected)
+    expect(commands).to include have_output Aruba::Platform.unescape(expected)
   end
 end
 
@@ -299,25 +299,25 @@ end
 # appear naturally in the output
 Then /^the output should( not)? match \/([^\/]*)\/$/ do |negated, expected|
   if negated
-    expect(all_commands).not_to include have_output Regexp.new(expected)
+    expect(all_commands).not_to include have_output Regexp.new(expected, Regexp::MULTILINE)
   else
-    expect(all_commands).to include have_output Regexp.new(expected)
+    expect(all_commands).to include have_output Regexp.new(expected, Regexp::MULTILINE)
   end
 end
 
 Then /^the output should( not)? match %r<([^>]*)>$/ do |negated, expected|
   if negated
-    expect(all_commands).not_to include have_output Regexp.new(expected)
+    expect(all_commands).not_to include have_output Regexp.new(expected, Regexp::MULTILINE)
   else
-    expect(all_commands).to include have_output Regexp.new(expected)
+    expect(all_commands).to include have_output Regexp.new(expected, Regexp::MULTILINE)
   end
 end
 
 Then /^the output should( not)? match:$/ do |negated, expected|
   if negated
-    expect(all_commands).not_to include have_output Regexp.new(expected)
+    expect(all_commands).not_to include have_output Regexp.new(expected, Regexp::MULTILINE)
   else
-    expect(all_commands).to include have_output Regexp.new(expected)
+    expect(all_commands).to include have_output Regexp.new(expected, Regexp::MULTILINE)
   end
 end
 
@@ -329,7 +329,7 @@ Then /^the exit status should( not)? be (\d+)$/ do |negated, exit_status|
   end
 end
 
-Then /^it should (pass|fail) with "(.*?)"$/ do |pass_fail, partial_output|
+Then /^it should (pass|fail) with "(.*?)"$/ do |pass_fail, expected|
   if pass_fail == 'pass'
     expect(last_command_stopped).to be_successfully_executed
     expect(last_command_stopped).to have_output Regexp.new(Regexp.escape(Aruba::Platform.unescape(expected)))
@@ -339,7 +339,7 @@ Then /^it should (pass|fail) with "(.*?)"$/ do |pass_fail, partial_output|
   end
 end
 
-Then /^it should (pass|fail) with:$/ do |pass_fail, partial_output|
+Then /^it should (pass|fail) with:$/ do |pass_fail, expected|
   if pass_fail == 'pass'
     expect(last_command_stopped).to be_successfully_executed
     expect(last_command_stopped).to have_output Regexp.new(Regexp.escape(Aruba::Platform.unescape(expected)))
@@ -349,7 +349,7 @@ Then /^it should (pass|fail) with:$/ do |pass_fail, partial_output|
   end
 end
 
-Then /^it should (pass|fail) with exactly:$/ do |pass_fail, exact_output|
+Then /^it should (pass|fail) with exactly:$/ do |pass_fail, expected|
   if pass_fail == 'pass'
     expect(last_command_stopped).to be_successfully_executed
     expect(last_command_stopped).to have_output Aruba::Platform.unescape(expected)
@@ -362,10 +362,10 @@ end
 Then /^it should (pass|fail) with regexp?:$/ do |pass_fail, expected|
   if pass_fail == 'pass'
     expect(last_command_stopped).to be_successfully_executed
-    expect(last_command_stopped).to have_output Regexp.new(expected)
+    expect(last_command_stopped).to have_output Regexp.new(expected, Regexp::MULTILINE)
   else
     expect(last_command_stopped).not_to be_successfully_executed
-    expect(last_command_stopped).to have_output Regexp.new(expected)
+    expect(last_command_stopped).to have_output Regexp.new(expected, Regexp::MULTILINE)
   end
 end
 
