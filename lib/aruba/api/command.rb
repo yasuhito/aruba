@@ -312,7 +312,7 @@ module Aruba
         aruba.config.before(:command, self, command)
 
         process_monitor.register_process(cmd, command)
-        command.run!
+        command.start
 
         aruba.config.after(:command, self, command)
 
