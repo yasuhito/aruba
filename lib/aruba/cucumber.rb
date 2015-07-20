@@ -507,7 +507,7 @@ Then /^(?:a|the) directory(?: named)? "([^"]*)" should (not )?exist$/ do |direct
   end
 end
 
-Then /^(?:a|the) file "([^"]*)" should (not )?contain "([^"]*)"$/ do |file, negated, content|
+Then /^(?:a|the) file(?: named)? "([^"]*)" should (not )?contain "([^"]*)"$/ do |file, negated, content|
   if negated
     expect(file).not_to have_file_content Regexp.new(Regexp.escape(content))
   else
@@ -515,7 +515,7 @@ Then /^(?:a|the) file "([^"]*)" should (not )?contain "([^"]*)"$/ do |file, nega
   end
 end
 
-Then /^(?:a|the) file "([^"]*)" should (not )?contain:$/ do |file, negated, content|
+Then /^(?:a|the) file(?: named)? "([^"]*)" should (not )?contain:$/ do |file, negated, content|
   if negated
     expect(file).not_to have_file_content Regexp.new(Regexp.escape(content.chomp))
   else
@@ -523,7 +523,7 @@ Then /^(?:a|the) file "([^"]*)" should (not )?contain:$/ do |file, negated, cont
   end
 end
 
-Then /^(?:a|the) file "([^"]*)" should (not )?contain exactly:$/ do |file, negated, content|
+Then /^(?:a|the) file(?: named)? "([^"]*)" should (not )?contain exactly:$/ do |file, negated, content|
   if negated
     expect(file).not_to have_file_content content
   else
@@ -531,7 +531,7 @@ Then /^(?:a|the) file "([^"]*)" should (not )?contain exactly:$/ do |file, negat
   end
 end
 
-Then /^(?:a|the) file "([^"]*)" should (not )?match %r<([^\/]*)>$/ do |file, negated, content|
+Then /^(?:a|the) file(?: named)? "([^"]*)" should (not )?match %r<([^\/]*)>$/ do |file, negated, content|
   if negated
     expect(file).not_to have_file_content Regexp.new(content)
   else
@@ -539,7 +539,7 @@ Then /^(?:a|the) file "([^"]*)" should (not )?match %r<([^\/]*)>$/ do |file, neg
   end
 end
 
-Then /^(?:a|the) file "([^"]*)" should (not )?match \/([^\/]*)\/$/ do |file, negated, content|
+Then /^(?:a|the) file(?: named)? "([^"]*)" should (not )?match \/([^\/]*)\/$/ do |file, negated, content|
   if negated
     expect(file).not_to have_file_content Regexp.new(content)
   else
@@ -547,7 +547,7 @@ Then /^(?:a|the) file "([^"]*)" should (not )?match \/([^\/]*)\/$/ do |file, neg
   end
 end
 
-Then /^(?:a|the) file "([^"]*)" should (not )?be equal to file "([^"]*)"/ do |file, negated, reference_file|
+Then /^(?:a|the) file(?: named)? "([^"]*)" should (not )?be equal to file "([^"]*)"/ do |file, negated, reference_file|
   if negated
     expect(file).not_to have_same_file_content_like(reference_file)
   else
@@ -560,5 +560,13 @@ Then /^the mode of filesystem object "([^"]*)" should (not )?match "([^"]*)"$/ d
     expect(file).not_to have_permissions(permissions)
   else
     expect(file).to have_permissions(permissions)
+  end
+end
+
+Then /^the (?:file|directory)(?: named)? "([^"]*)" should have permissions "([^"]*)"$/ do |path, negated, permissions|
+  if negated
+    expect(path).not_to have_permissions(permissions)
+  else
+    expect(path).to have_permissions(permissions)
   end
 end
