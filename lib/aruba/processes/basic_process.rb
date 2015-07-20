@@ -50,8 +50,14 @@ module Aruba
 
       private
 
-      def which(program)
-        Aruba::Platform.which(program, environment['PATH'])
+      def with_local_env(e, &block)
+        old_env = ENV.to_hash
+        ENV.update e
+
+        block.call
+      ensure
+        ENV.clear
+        ENV.update old_env
       end
 
       def command
