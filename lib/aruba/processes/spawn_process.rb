@@ -99,7 +99,7 @@ module Aruba
 
         wait_for_io wait_for_io do
           @process.io.stdout.flush
-          open(@err).read
+          open(@out).read
         end
       end
 
