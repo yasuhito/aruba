@@ -355,6 +355,10 @@
 * Fix for Gemfile excludes windows for many gems (issue #282)
 * Make feature tests compatible with ruby 1.9.2
 * Gather disk usage for file(s) (issue #294)
+* Redefine #to_s and #inspect for BasicProcess to reduce the sheer amount of
+  information, if a command produces a lot of output
+* Added new matcher to check if an object is included + a error message for
+  failures which is similar to the `#all`-matcher of `RSpec`
 
 ## [v1.0.0](https://github.com/cucumber/aruba/compare/v0.11.0...v1.0.0)
 
