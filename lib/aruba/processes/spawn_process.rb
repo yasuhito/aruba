@@ -31,8 +31,8 @@ module Aruba
         @exit_timeout = exit_timeout
         @io_wait      = io_wait
         @process      = nil
-        @output_cache = nil
-        @error_cache  = nil
+        @stdout_cache       = nil
+        @stderr_cache       = nil
       end
 
       # Run the command
@@ -43,16 +43,16 @@ module Aruba
       # rubocop:disable Metrics/MethodLength
       # rubocop:disable Metrics/CyclomaticComplexity
       def start
-        @process   = ChildProcess.build(command, *arguments)
-        @out       = Tempfile.new("aruba-out")
-        @err       = Tempfile.new("aruba-err")
+        @process     = ChildProcess.build(command, *arguments)
+        @stdout_file = Tempfile.new("aruba-stdout")
+        @stderr_file = Tempfile.new("aruba-stderr")
         @exit_status = nil
-        @duplex    = true
+        @duplex      = true
 
         before_run
 
-        @process.io.stdout = @out
-        @process.io.stderr = @err
+        @process.io.stdout = @stdout_file
+        @process.io.stderr = @stderr_file
         @process.duplex    = @duplex
         @process.cwd       = @working_directory
 
@@ -80,24 +80,24 @@ module Aruba
       end
 
       def stdout(opts = {})
-        return @output_cache if @process.nil?
+        return @stdout_cache if @process.nil?
 
         wait_for_io = opts.fetch(:wait_for_io, @io_wait)
 
         wait_for_io wait_for_io do
           @process.io.stdout.flush
-          open(@out).read
+          open(@stdout_file).read
         end
       end
 
       def stderr(opts = {})
-        return @error_cache if @process.nil?
+        return @stderr_cache if @process.nil?
 
         wait_for_io = opts.fetch(:wait_for_io, @io_wait)
 
         wait_for_io wait_for_io do
           @process.io.stderr.flush
-          open(@err).read
+          open(@stderr_file).read
         end
       end
 
@@ -106,7 +106,7 @@ module Aruba
         Aruba::Platform.deprecated('The use of "#read_stdout" is deprecated. Use "#stdout" instead. To reduce the time to wait for io, pass `:wait_for_io => 0` or some suitable for your use case')
         # rubocop:enable Metrics/LineLength
 
-        stdout
+        stdout(:wait_for_io => 0)
       end
 
       def write(input)
@@ -177,15 +177,15 @@ module Aruba
       end
 
       def close_and_cache_out
-        @output_cache = read @out
-        @out.close
-        @out = nil
+        @stdout_cache = read @stdout_file
+        @stdout_file.close
+        @stdout_file = nil
       end
 
       def close_and_cache_err
-        @error_cache = read @err
-        @err.close
-        @err = nil
+        @stderr_cache = read @stderr_file
+        @stderr_file.close
+        @stderr_file = nil
       end
     end
   end
