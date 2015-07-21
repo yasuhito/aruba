@@ -350,6 +350,11 @@
 ## [v0.9.0](https://github.com/cucumber/aruba/compare/v0.8.0...v0.9.0)
 
 * Improve documentation for filesystem api and move it to feature tests
+* Improve documentation for commands, installation, getting started etc.
+* Add documentation for announcers
+* Replace `last_command` through `last_command_started` and add `last_command_stopped`
+* Improve documentation for `@debug`-tag
+* Suppress SimpleCov-output in fixture "cli-app"
 * Add logger to aruba. Its output can be captured by rspec.
 * Fix incorrect deprecation message for check_file_presence (issue #292)
 * Fix for Gemfile excludes windows for many gems (issue #282)
@@ -359,6 +364,9 @@
   information, if a command produces a lot of output
 * Added new matcher to check if an object is included + a error message for
   failures which is similar to the `#all`-matcher of `RSpec`
+* Add `have_output`-, `have_output_on_stderr`, `have_output_on_stdout`-matchers
+* Replace all `assert_*` and `check_*`-methods through expectations
+* Add hook `@announce-output` to output both, stderr and stdout
 
 ## [v1.0.0](https://github.com/cucumber/aruba/compare/v0.11.0...v1.0.0)
 
