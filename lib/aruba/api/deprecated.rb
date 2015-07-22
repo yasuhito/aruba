@@ -814,7 +814,7 @@ module Aruba
       # Overwrite this method if you want a different timeout or set
       # `@aruba_io_wait_seconds
       def io_wait
-        Aruba::Platform.deprecated('The use of "#io_wait" is deprecated. Use "aruba.config.io_wait_timeout" instead.')
+        Aruba::Platform.deprecated('The use of "#io_wait" is deprecated. Use "aruba.config.io_wait_timeout" instead')
 
         aruba.config.io_wait_timeout
       end
@@ -822,7 +822,7 @@ module Aruba
       # @deprecated
       # The root directory of aruba
       def root_directory
-        Aruba::Platform.deprecated('The use of "#root_directory" is deprecated. Use "aruba.root_directory" instead.')
+        Aruba::Platform.deprecated('The use of "#root_directory" is deprecated. Use "aruba.root_directory" instead')
 
         aruba.config.root_directory
       end
@@ -830,7 +830,7 @@ module Aruba
       # @deprecated
       # Only processes
       def only_processes
-        # Aruba::Platform.deprecated('The use of "#only_processes" is deprecated.')
+        Aruba::Platform.deprecated('The use of "#only_processes" is deprecated. Use "#all_commands" instead')
 
         process_monitor.only_processes
       end
